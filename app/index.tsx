@@ -1,34 +1,39 @@
-import { Text, View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { Link } from "expo-router";
-import React, { useState } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
-
-
-import Scan from "./ScanScreen";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { createStackNavigator, StackNavigationProp } from "@react-navigation/stack";
 import TypeScreen from "./TypeScreen";
+import ScanScreen from "./ScanScreen"; 
 
+type RootStackParamList = {
+  Home: undefined;
+  Scan: undefined;
+  Type: undefined;
+};
 
+interface HomeScreenProps {
+  navigation: StackNavigationProp<RootStackParamList, "Home">;
+}
 
+const Stack = createStackNavigator<RootStackParamList>();
 
-
-
-export default function Index() {
-  const [screen, setScreen] = useState("home");
-
-
-  if (screen == "scan") return <Scan goBack={() => setScreen("home")} />
-  if (screen == "type") return <TypeScreen goBack={() => setScreen("home")} />
+function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>savor</Text>
-      <Text style={styles.subtitle}>scan, cook, savor</Text>
-
+      <Text style={styles.title}>Savor</Text>
+      <Text style={styles.subtitle}>Scan, cook, savor</Text>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => setScreen("scan")}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Scan")}
+        >
           <Text style={styles.buttonText}>Scan</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert("Type Pressed")}>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Type")}
+        >
           <Text style={styles.buttonText}>Type</Text>
         </TouchableOpacity>
       </View>
@@ -36,13 +41,22 @@ export default function Index() {
   );
 }
 
-
-
+export default function Index() {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Scan">
+        {(props) => <ScanScreen {...props} goBack={props.navigation.goBack} />}
+      </Stack.Screen>
+      <Stack.Screen name="Type" component={TypeScreen} />
+    </Stack.Navigator>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E25D5D", // Red background
+    backgroundColor: "#E25D5D",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -74,5 +88,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-})
+  },
+});

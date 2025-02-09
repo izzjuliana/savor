@@ -2,30 +2,19 @@ import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Button, Alert, SafeAreaView, Image } from "react-native";
 import { useEffect, useRef, useState} from "react";
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-
-// import axios from "axios";
 import Results from "./Results"
 import OpenAI from "openai";
-
-
-
-
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 
 export default function Scan({ goBack } : { goBack: () => void}) {
   const cameraRef = useRef<CameraView>(null);
-  const [screen, setScreen] = useState<"selection" | "camera" | "preview" | "results">("selection");
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [photo, setPhoto] = useState<string | null>(null);
+  const [screen, setScreen] = useState<"selection" | "camera" | "preview" | "results">("selection");
   const [labels, setLabels] = useState<{ description: string}[]>([]);
-
-
-
-
- 
 
 
   const openCamera = async () => {
@@ -51,13 +40,10 @@ export default function Scan({ goBack } : { goBack: () => void}) {
     }
   }
   if (!permission) {
-    // Camera permissions are still loading.
     return <View />;
   }
 
-
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
@@ -66,11 +52,9 @@ export default function Scan({ goBack } : { goBack: () => void}) {
     );
   }
 
-
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
-
 
   const takePicture = async () => {
     if (cameraRef.current){
@@ -88,85 +72,104 @@ export default function Scan({ goBack } : { goBack: () => void}) {
       }
     }
   };
- 
   const goToSelection = () => {
     setScreen("selection");
     setPhoto(null);
     setLabels([]);
   }
 
-
- 
   const analyzeImage = async () => {
-      try {
-        if(!photo){
-          alert("Please select an image first!");
-          return;
-        }
-     
-        const apiKey = process.env.API_KEY;
-        const openai = new OpenAI({
-          apiKey,
-        });
-       
-        const hello = await openai.models.list();
-        console.log("Available models:", hello);
+    try {
+      if(!photo){
+        alert("Please select an image first!");
+        return;
+      }
    
-
-
-        const base64ImageData = await FileSystem.readAsStringAsync(photo, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: "You are a food expert that identifies ingredients in images and suggests recipes." },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: "What food ingredients are in this image?" },
-                {
-                  type: "image_url",
-                  image_url: { url: `data:image/jpeg;base64,${base64ImageData}`},
-                },
-              ],
-            },
-          ],
-          max_tokens: 500,
-        })
-
-
-        if(!response.choices || response.choices.length === 0){
-          alert("no response");
-          return;
-        }
-       
-        const detectedIngredients = response.choices[0]?.message?.content?.split(", ") || [];
-
-
-        const formatIngredeints = detectedIngredients.map((ingredeint) => ({ description: ingredeint}));
-        setLabels(formatIngredeints);
-        setScreen("results");
-    } catch (error) {
-      console.error("Error in analyzeImage error", error);
-
-
-    }
-
-
+      const apiKey = process.env.API_KEY;
+      const openai = new OpenAI({
+        apiKey,
+      });
      
+      const hello = await openai.models.list();
+      console.log("Available models:", hello);
+ 
+
+
+      const base64ImageData = await FileSystem.readAsStringAsync(photo, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are a food expert that identifies ingredients in images and suggests recipes." },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "What food ingredients are in this image?" },
+              {
+                type: "image_url",
+                image_url: { url: `data:image/jpeg;base64,${base64ImageData}`},
+              },
+            ],
+          },
+        ],
+        max_tokens: 500,
+      })
+
+
+      if(!response.choices || response.choices.length === 0){
+        alert("no response");
+        return;
+      }
+     
+      const detectedIngredients = response.choices[0]?.message?.content?.split(", ") || [];
+
+
+      const formatIngredeints = detectedIngredients.map((ingredeint) => ({ description: ingredeint}));
+      setLabels(formatIngredeints);
+      setScreen("results");
+  } catch (error) {
+    console.error("Error in analyzeImage error", error);
+
+
+  }
+
+
+   
+};
+
+
+  const renderPicture = () => {
+    return (
+      <SafeAreaView>
+        <Image style={styles.preview} source={{ uri:photo ?? "" }}/>
+          <Button onPress={() => setPhoto(null)} title ="Take another picutre" />
+      </SafeAreaView>
+    )
   };
 
+  const renderCamera = () => {
+    return (
+      <View style={styles.container}>
+        <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+              <Text style={styles.text}>Flip Camera</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={takePicture}>
+              <Text style={styles.text}>Take Pic</Text>
+            </TouchableOpacity>
+          </View>
+        </CameraView>
+      </View>
+    );
 
 
+  }
 
-
-
- 
-
-
+  
   if (screen === "selection") {
     return (
       <View style={styles.container}>
@@ -294,4 +297,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 15,
   }
-})
+});
+
+

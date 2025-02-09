@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Button, Alert, SafeAreaView, 
 import { useEffect, useRef, useState} from "react";
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import Results from "./Results"
-import OpenAI from "openai";
+import { OpenAI } from "openai";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
+import { getRecipes } from "./getRecipes";
 
 export default function Scan({ goBack } : { goBack: () => void}) {
   const cameraRef = useRef<CameraView>(null);
@@ -15,7 +15,7 @@ export default function Scan({ goBack } : { goBack: () => void}) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [screen, setScreen] = useState<"selection" | "camera" | "preview" | "results">("selection");
   const [labels, setLabels] = useState<{ description: string}[]>([]);
-
+  const [recipes, setRecipes] = useState<string[]>([]);
 
   const openCamera = async () => {
     setScreen("camera")
@@ -76,6 +76,7 @@ export default function Scan({ goBack } : { goBack: () => void}) {
     setScreen("selection");
     setPhoto(null);
     setLabels([]);
+    setRecipes([]);
   }
 
   const analyzeImage = async () => {
@@ -103,11 +104,11 @@ export default function Scan({ goBack } : { goBack: () => void}) {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are a food expert that identifies ingredients in images and suggests recipes." },
+          { role: "system", content: "You are a food expert that identifies ingredients in images." },
           {
             role: "user",
             content: [
-              { type: "text", text: "What food ingredients are in this image?" },
+              { type: "text", text: "What food ingredients are in this image, be as specific as possible?" },
               {
                 type: "image_url",
                 image_url: { url: `data:image/jpeg;base64,${base64ImageData}`},
@@ -128,7 +129,9 @@ export default function Scan({ goBack } : { goBack: () => void}) {
 
 
       const formatIngredeints = detectedIngredients.map((ingredeint) => ({ description: ingredeint}));
+      const recipeSuggestions = await getRecipes(formatIngredeints) || [];
       setLabels(formatIngredeints);
+      setRecipes(recipeSuggestions);
       setScreen("results");
   } catch (error) {
     console.error("Error in analyzeImage error", error);
@@ -191,7 +194,7 @@ export default function Scan({ goBack } : { goBack: () => void}) {
       );
   }
   if (screen === "results"){
-    return <Results labels={labels} goBack={goToSelection} />
+    return <Results recipes={recipes} goBack={goToSelection} />
   }
   if (screen == "camera"){
     return (
@@ -298,5 +301,3 @@ const styles = StyleSheet.create({
     gap: 15,
   }
 });
-
-

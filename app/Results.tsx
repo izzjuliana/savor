@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
 
-import { View, Alert, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { View, Alert, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, FlatList } from "react-native";
 
 
-function Results({ labels=[], goBack } : {labels: { description: string}[]; goBack: () => void}) {
+function Results({ recipes=[], goBack } : {recipes: string[]; goBack: () => void}) {
 
 
     useEffect(() => {
@@ -19,13 +19,12 @@ function Results({ labels=[], goBack } : {labels: { description: string}[]; goBa
 
 
       <ScrollView style={styles.resultsContainer}>
-      {labels.length > 0 ? (
-          <View>
-            <Text style={styles.label}>Ingredients:</Text>
-            {labels.map((label, index) => (
-              <Text key={index} style={styles.outputtext}>{label.description}</Text> // ✅ Added key prop
-            ))}
-          </View>
+      {recipes.length > 0 ? (
+          <FlatList
+          data={recipes}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text style={styles.outputtext}>• {item}</Text>}
+        />
         ) : (
           <Text style={styles.outputtext}>No ingredients detected.</Text> // ✅ Handles empty labels
         )}

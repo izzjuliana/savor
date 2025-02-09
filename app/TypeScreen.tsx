@@ -1,10 +1,27 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, FlatList } from "react-native";
+import { getRecipes } from "./getRecipes";
+import Results from "./Results";
 
 function TypeScreen() {
   const [ingredients, makeIng] = useState(""); 
-  const [ingList, makeIngList] = useState<string[]>([]); 
+  const [ingList, makeIngList] = useState<string[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [recipes, setRecipes] = useState<string[]>([]);
 
+
+  const handleSubmit = async () =>{
+    if(!ingList.length) return;
+
+    
+    const formattedIngredients = ingList.map(item=> ({ description: item}))
+    
+
+    const recipeSuggestions = await getRecipes(formattedIngredients) || [];
+    setRecipes(recipeSuggestions);
+    setShowResults(true);
+
+  }
   const addIngs=() => {
     if (ingredients.trim()) { 
       makeIngList([...ingList, ingredients.trim()]); 
@@ -14,6 +31,11 @@ function TypeScreen() {
 
   return (
     <View style={styles.container}>
+      {showResults ? (
+          <Results recipes={recipes} goBack={() => setShowResults(false)} />
+
+      ): (
+        <>
       <Text style={styles.title}>Type Ingredients Here</Text>
 
       <TextInput
@@ -33,6 +55,10 @@ function TypeScreen() {
         )}
         ListEmptyComponent={<Text style={styles.ingredientsText}>No Ingredients Added</Text>}
       />
+
+      {ingList.length > 0 && <Button title="Get Recipes" onPress={handleSubmit} />}
+      </>
+      )}
     </View>
   );
 }

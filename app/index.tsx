@@ -1,14 +1,20 @@
 import { Text, View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Link } from "expo-router";
 import React, { useState } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+
 
 import Scan from "./ScanScreen";
 import TypeScreen from "./TypeScreen";
 
 
 
+
+
+
 export default function Index() {
   const [screen, setScreen] = useState("home");
+
 
   if (screen == "scan") return <Scan goBack={() => setScreen("home")} />
   if (screen == "type") return <TypeScreen goBack={() => setScreen("home")} />
@@ -16,6 +22,7 @@ export default function Index() {
     <View style={styles.container}>
       <Text style={styles.title}>savor</Text>
       <Text style={styles.subtitle}>scan, cook, savor</Text>
+
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => setScreen("scan")}>
@@ -28,6 +35,8 @@ export default function Index() {
     </View>
   );
 }
+
+
 
 
 const styles = StyleSheet.create({

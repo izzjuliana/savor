@@ -1,50 +1,21 @@
-# Welcome to your Expo app 👋
+## Inspiration
+Since we are freshmen in college, we find it difficult to figure out what to eat. As a result, we came up with this app idea which can instantly scan the ingredients that the users currently have. Our hope is to help any busy individuals to be able to cook with what they have while simultaneously making cooking more accessible to everyone.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## What it does
+In essence, our app allows the user to either scan or manually input the ingredients that they currently have in their home. Once they input this information, this application will read in all the ingredients and present the user a few recipes tailored to what is available.
 
-## Get started
+## How we built it
+We used React Native to develop this application and integrated OpenAI's API to identify ingredients from images submitted by the user, whether taken with their camera or imported from their gallery, to generate the recipes.
 
-1. Install dependencies
+## Challenges we ran into
+Since we have never worked with Native-React, the beginning was quite difficult for us since we had to learn about our development environment, how it operates, and manage to structure our code efficiently. Even having to integrate the Open AI API into our software proved to be a challenge as we had to navigate parsing, request handling, and so much more.
 
-   ```bash
-   npm install
-   ```
+## What we learned
+We learned how to deal with the complex components within our app and how to organize our tasks efficiently. Being introduced to this unfamiliar environment was a challenge, but we were able to adapt and strengthen our technical abilities.
 
-2. Start the app
+## What's next for Savor
+We truly want to improve the UI/UX of this application since we believe it is lacking. Within the aspect of functionality, we want to allow the user to login and be able to save recipes that they enjoyed using a firebase storage; also, we wish to allow for the user to delete any added ingredients and display the nutritional info of the recipe.
 
-   ```bash
-    npx expo start
-   ```
+## DEMO
+https://www.youtube.com/shorts/7TwJpbZgKEQ
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
